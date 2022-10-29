@@ -41,7 +41,7 @@
     var timerCount = 0;
     var timerOn = false;
 
-    var chatLog; 
+    var chatLog = ['', '', '', '', '', '']; 
     var inParty = []; 
     var inPartyString = "";
 
@@ -69,7 +69,6 @@
         timerText = this.add.text(100, 10, '', { fill: '#003300' })
         updateTimer();
 
-        chatLog = ['', '', '', '', '', ''];
         chatLogText1 = this.add.text(500, 400, chatLog[0]);
         chatLogText2 = this.add.text(500, 430, chatLog[1]);
         chatLogText3 = this.add.text(500, 460, chatLog[2]);
