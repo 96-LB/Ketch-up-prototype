@@ -35,55 +35,76 @@
 
     var game = new Phaser.Game(config);
 
-    var button;
+    var startButton;
 
-    var timer; 
     var timerCount = 0;
     var timerOn = false;
 
+
     function preload ()
     {
-        this.load.image('sky', 'static/assets/sky.png');
+        this.load.image('carrot', 'static/assets/carrot.png');
     } 
 
     function create ()
     {    
-        timerText = this.add.text(100, 200, '');
+
+        const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+        const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
         // Start button
-        this.add.image(400,400, 'sky');
-        const startButton = this.add.image(100, 100, 'sky')
+        this.add.image(400,400, 'carrot');
+        startButton = this.add.text(screenCenterX / 2, screenCenterY, 'start')
+        .setOrigin(0.5)
         .setInteractive()
-        .on('pointerdown', () => startTimer(this));
+        .on('pointerdown', () => toggleTimer(this));
 
+        timerText = this.add.text(screenCenterX, screenCenterY / 2, '', { fill: '#0f0' })
+        .setOrigin(0.5);
         updateTimer();
+
+        chatLogText1 = this.add.text(500, 400, 'msg1');
+        chatLogText2 = this.add.text(500, 450, 'msg2');
+        chatLogText3 = this.add.text(500, 500, 'msg2');
+        chatLogText4 = this.add.text(500, 550, 'msg2');
+        chatLogText5 = this.add.text(500, 600, 'msg2');
     }
     
-    function startTimer(game) 
+    function toggleTimer(game) 
     {
-        console.log("Starting timer")
-        //timer = game.time.delayedCall(3000, null, [], this);
-        
-        while (!timerStoppped) {
-            console.log(timer.getProgress());
+        timerOn = !timerOn;
+        if (timerOn) {
+            console.log("Starting timer")
+            startButton.setText('pause');
+        } else {
+            console.log("Pausing timer")
+            startButton.setText('continue'); 
         }
     }
 
     function updateTimer() 
     {
-        timerText.setText(`You are ${++timerCount} seconds closer to your doom`);
+        timerText.setText(`Time: ${Math.floor(timerCount / 60)} minutes, ${timerCount % 60} seconds`);
     }
+
+    var prevTime = 0;
 
     function update(time, delta)
     {
-        console.log(time/1000);
+        if (timerOn) {
+            if (Math.floor(time/1000) != prevTime) {
+                prevTime = Math.floor(time/1000);
+                timerCount++;
+                console.log(timerCount);
+            }
+            updateTimer();
+        }
     }
     
     function render() 
     {
 
     }
-    // Button
 
 
 </script>
