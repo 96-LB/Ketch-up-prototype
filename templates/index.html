@@ -60,6 +60,12 @@
         chatLogText6 = this.add.text(500, 550, chatLog[5]);
 
         inPartyText = this.add.text(500, 10, "In party: " + inPartyString);
+        
+        socket = io();
+        socket.on('message', updateChatLog);
+        socket.on('joinID', updatePartyJoin);
+        socket.on('leaveID', updatePartyLeave);
+        socket.emit('join', '{{room}}', setUpPartyList);
     }
     
     function toggleTimer(game)
@@ -149,12 +155,6 @@
     };
 
     var game = new Phaser.Game(config);
-    
-    socket = io();
-    socket.on('message', updateChatLog);
-    socket.on('joinID', updatePartyJoin);
-    socket.on('leaveID', updatePartyLeave);
-    socket.emit('join', '{{room}}', setUpPartyList);
 
 
 </script>
