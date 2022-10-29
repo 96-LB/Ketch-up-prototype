@@ -1,2 +1,2 @@
-# Ketchup
-It's time to Ketchup on your work~!
+# Ketch-up
+It's time to Ketch up on your work~!
