@@ -19,12 +19,12 @@
     socket.on('message', updateChatLog);
     socket.on('joinID', updatePartyJoin);
     socket.on('leaveID', updatePartyLeave);
-    socket.emit('join', '{{room}}');
+    socket.emit('join', '{{room}}', setUpPartyList);
     
     var config = {
         type: Phaser.AUTO,
         width: 800,
-        height: 800,
+        height: 600,
         scene: {
             preload: preload,
             create: create,
@@ -36,6 +36,7 @@
     var game = new Phaser.Game(config);
 
     var startButton;
+    var startButtonText;
 
     var timerCount = 0;
     var timerOn = false;
@@ -47,23 +48,25 @@
     function preload ()
     {
         this.load.image('carrot', 'static/assets/carrot.png');
+        this.load.image('background', 'static/assets/background.png');
+        this.load.image('button', 'static/assets/buttonBackground.png');
     } 
 
     function create ()
     {    
-
+        this.add.image(400, 400, 'background');
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
-        // Start button
-        this.add.image(400,400, 'carrot');
-        startButton = this.add.text(screenCenterX / 2, screenCenterY, 'start')
+        // Start button        
+        startButton = this.add.image(screenCenterX / 2, (screenCenterY * 2) / 3, 'button')
         .setOrigin(0.5)
         .setInteractive()
         .on('pointerdown', () => toggleTimer(this));
+        startButtonText = this.add.text(screenCenterX / 2, (screenCenterY * 2) / 3, 'start').setOrigin(0.5)
 
-        timerText = this.add.text(screenCenterX, screenCenterY / 2, '', { fill: '#0f0' })
-        .setOrigin(0.5);
+
+        timerText = this.add.text(100, 10, '', { fill: '#003300' })
         updateTimer();
 
         chatLog = ['', '', '', '', '', ''];
@@ -77,6 +80,7 @@
         inParty = [];
         inPartyString = "";
         inPartyText = this.add.text(500, 10, "In party: " + inPartyString);
+        setUpPartyList();
     }
     
     function toggleTimer(game) 
@@ -84,10 +88,10 @@
         timerOn = !timerOn;
         if (timerOn) {
             updateChatLog("Starting timer")
-            startButton.setText('pause');
+            startButtonText.setText('pause');
         } else {
             updateChatLog("Pausing timer")
-            startButton.setText('continue'); 
+            startButtonText.setText('continue'); 
         }
     }
 
@@ -127,6 +131,11 @@
     
     function updatePartyLogUI() {
         inPartyText.setText("In party: \n" + inParty.join('\n'));
+    }
+
+    function setUpPartyList(namesList) {
+        inParty = namesList;
+        // inPartyText.setText("In party: \n" + inParty.join('\n'));
     }
 
     var prevTime = 0;
