@@ -8,20 +8,21 @@ from threading import Thread
 #sets up a flask application
 app = Flask('Ketchup')
 app.url_map.strict_slashes = False
-#app.config['SERVER_NAME'] = 'universitytwow.cf'
-app.config['SECRET_KEY'] = b64encode(os.getenv('SECRET_KEY', 'pineappleselena').encode('utf-8'))
+app.config['SERVER_NAME'] = os.getenv('SERVER_NAME', 'localhost:5000')
+app.config['SECRET_KEY'] = b64encode(os.getenv('SECRET_KEY').encode('utf-8'))
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 app.jinja_env.filters['debug'] = lambda x: print(x) or ''
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = 'true' #suppresses reverse-proxy http errors - proxy should already force https
 
 #loads in discord environment variables
-#for key in ['CLIENT_ID', 'CLIENT_SECRET', 'REDIRECT_URI']:
-#    key = 'DISCORD_' + key
-#    app.config[key] = os.environ[key]
+app.config['DISCORD_REDIRECT_URI'] = 'callback'
+for key in ['CLIENT_ID', 'CLIENT_SECRET', 'REDIRECT_URI']:
+    key = 'DISCORD_' + key
+    app.config[key] = os.environ[key]
 
 #start a discord oauth application
-#discord = DiscordOAuth2Session(app)
-#app.jinja_env.globals['discord'] = discord
+discord = DiscordOAuth2Session(app)
+app.jinja_env.globals['discord'] = discord
 
 def jinja_env(f):
     #adds a function to the jinja environment
