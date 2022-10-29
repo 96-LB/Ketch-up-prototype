@@ -39,6 +39,7 @@
     var timerOn = false;
 
     var chatLog; 
+    var inParty; 
 
     function preload ()
     {
@@ -64,12 +65,18 @@
 
         chatLog = ['', '', '', '', '', ''];
         chatLogText1 = this.add.text(500, 400, chatLog[0]);
-        chatLogText2 = this.add.text(500, 440, chatLog[1]);
-        chatLogText3 = this.add.text(500, 480, chatLog[2]);
-        chatLogText4 = this.add.text(500, 520, chatLog[3]);
-        chatLogText5 = this.add.text(500, 560, chatLog[4]);
-        chatLogText6 = this.add.text(500, 600, chatLog[5]);
+        chatLogText2 = this.add.text(500, 430, chatLog[1]);
+        chatLogText3 = this.add.text(500, 460, chatLog[2]);
+        chatLogText4 = this.add.text(500, 490, chatLog[3]);
+        chatLogText5 = this.add.text(500, 520, chatLog[4]);
+        chatLogText6 = this.add.text(500, 550, chatLog[5]);
 
+        inParty = ['', '', '', '']
+        inPartyText0 = this.add.text(500, 10, "In party: ");
+        inPartyText1 = this.add.text(500, 30, inParty[0]); 
+        inPartyText2 = this.add.text(500, 50, inParty[1]);
+        inPartyText3 = this.add.text(500, 70, inParty[2]);
+        inPartyText4 = this.add.text(500, 90, inParty[4]);
     }
     
     function toggleTimer(game) 
@@ -93,8 +100,9 @@
     {
         chatLog.shift();
         chatLog.push(newLog);
-        console.log(newLog);
 
+        if (newLog)
+    
         updateChatLogUI();
     }
 
@@ -105,6 +113,23 @@
         chatLogText4.setText(chatLog[3]);
         chatLogText5.setText(chatLog[4]);
         chatLogText6.setText(chatLog[5]);
+    }
+
+    function updateInParty(name, remove) {
+        if (remove) {
+            inParty.remove(name);
+        } else {
+            inParty.push(name);
+        }
+
+        updateInPartyUI();
+    }
+    
+    function updateInPartyUI() {
+        inPartyText1.setText(inParty[0]);
+        inPartyText2.setText(inParty[1]);
+        inPartyText3.setText(inParty[2]);
+        inPartyText4.setText(inParty[3]);
     }
 
     var prevTime = 0;
