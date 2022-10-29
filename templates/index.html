@@ -42,6 +42,7 @@
 
     var chatLog; 
     var inParty; 
+    var inPartyString;
 
     function preload ()
     {
@@ -73,12 +74,9 @@
         chatLogText5 = this.add.text(500, 520, chatLog[4]);
         chatLogText6 = this.add.text(500, 550, chatLog[5]);
 
-        inParty = ['', '', '', '']
-        inPartyText0 = this.add.text(500, 10, "In party: ");
-        inPartyText1 = this.add.text(500, 30, inParty[0]); 
-        inPartyText2 = this.add.text(500, 50, inParty[1]);
-        inPartyText3 = this.add.text(500, 70, inParty[2]);
-        inPartyText4 = this.add.text(500, 90, inParty[4]);
+        inParty = [];
+        inPartyString = "";
+        inPartyText = this.add.text(500, 10, "In party: " + inPartyString);
     }
     
     function toggleTimer(game) 
@@ -116,24 +114,19 @@
     }
 
     function updatePartyJoin(name) {
-        inParty.shift();
-        inParty.push(name, 0);
+        inParty.push(name);
 
         updatePartyLogUI();
     }
 
     function updatePartyLeave(name) {
-        inParty.remove(name);
-        inParty.push("");
+        inParty.splice(inParty.indexOf(name), 1);
 
         updatePartyLogUI();
     }
     
     function updatePartyLogUI() {
-        inPartyText1.setText(inParty[0]);
-        inPartyText2.setText(inParty[1]);
-        inPartyText3.setText(inParty[2]);
-        inPartyText4.setText(inParty[3]);
+        inPartyText.setText("In party: \n" + inParty.join('\n'));
     }
 
     var prevTime = 0;
