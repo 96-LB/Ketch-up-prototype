@@ -8,3 +8,5 @@ replit.nix
 .replit
 .env
 .vscode
+
+data/**
