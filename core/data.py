@@ -35,7 +35,6 @@ class JSONData(ABC):
     
     @abstractmethod
     def __init__(self, file):
-        print('base')
         self._file = file
         self._data = self.load(file)
         
