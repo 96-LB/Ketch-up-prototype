@@ -63,8 +63,8 @@
         
         socket = io();
         socket.on('message', updateChatLog);
-        socket.on('joinID', updatePartyJoin);
-        socket.on('leaveID', updatePartyLeave);
+        socket.on('user_join', updatePartyJoin);
+        socket.on('user_leave', updatePartyLeave);
         socket.emit('join', '{{room}}', setUpPartyList);
     }
     
@@ -102,14 +102,14 @@
         chatLogText6.setText(chatLog[5]);
     }
 
-    function updatePartyJoin(name) {
-        inParty.push(name);
+    function updatePartyJoin(player) {
+        inParty.push(player.name);
 
         updatePartyLogUI();
     }
 
-    function updatePartyLeave(name) {
-        inParty.splice(inParty.indexOf(name), 1);
+    function updatePartyLeave(player) {
+        inParty.splice(inParty.indexOf(player.name), 1);
 
         updatePartyLogUI();
     }
@@ -118,9 +118,10 @@
         inPartyText.setText("In party: \n" + inParty.join('\n'));
     }
 
-    function setUpPartyList(namesList) {
-        inParty = namesList;
-        inPartyText.setText("In party: \n" + inParty.join('\n'));
+    function setUpPartyList(players) {
+        inParty = players.map((player) => player.name);
+        
+        updatePartyLogUI();
     }
 
     var prevTime = 0;

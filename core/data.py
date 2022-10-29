@@ -10,7 +10,7 @@ for path in ['data', 'data/players', 'data/rooms']:
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, JSONData):
-            return obj.to_json()
+            return obj.to_dict()
         return json.JSONEncoder.default(self, obj)
 json.JSONEncoder.default = CustomJSONEncoder.default
 
@@ -51,14 +51,14 @@ class JSONData(ABC):
         self.__inited__ = True
         self._file = file
         self._data = self.load(file)
-        
+    
     @abstractmethod
-    def to_json(self):
-        return json.dumps(self.__dict__)
+    def to_dict(self):
+        ...
     
     def update(self):
         with open(self._file, 'w') as f:
-            f.write(self.to_json())
+            f.write(json.dumps(self))
 
 
 class Player(JSONData):
@@ -71,21 +71,17 @@ class Player(JSONData):
     def get_id(self):
         return self._id
     
-    def get_name(self):
-        return self._data['name']
+    def get_user(self):
+        return self._data['user']
     
-    @update
-    def set_name(self, name):
-        self._data['name'] = name
-    
-    
-    
-    
-    def to_json(self):
-        return json.dumps({
+    def set_user(self, user):
+        self._data['user'] = user
+        
+    def to_dict(self):
+        return {
             'id': self.get_id(),
-            'name': self.get_name()
-        })
+            'name': self._data['user'].name
+        }
 
 
 
@@ -113,5 +109,5 @@ class Room(JSONData):
     def get_players(self):
         return list(self._data['players'])
     
-    def to_json(self):
-        return json.dumps({'test2': self.get_test()})
+    def to_dict(self):
+        return {'test2': self.get_test()}
