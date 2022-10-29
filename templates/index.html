@@ -17,6 +17,8 @@
     
     socket = io();
     socket.on('message', updateChatLog);
+    socket.on('joinID', updatePartyJoin);
+    socket.on('leaveID', updatePartyLeave);
     socket.emit('join', '{{room}}');
     
     var config = {
@@ -100,8 +102,6 @@
     {
         chatLog.shift();
         chatLog.push(newLog);
-
-        if (newLog)
     
         updateChatLogUI();
     }
@@ -115,17 +115,21 @@
         chatLogText6.setText(chatLog[5]);
     }
 
-    function updateInParty(name, remove) {
-        if (remove) {
-            inParty.remove(name);
-        } else {
-            inParty.push(name);
-        }
+    function updatePartyJoin(name) {
+        inParty.shift();
+        inParty.push(name, 0);
 
-        updateInPartyUI();
+        updatePartyLogUI();
+    }
+
+    function updatePartyLeave(name) {
+        inParty.remove(name);
+        inParty.push("");
+
+        updatePartyLogUI();
     }
     
-    function updateInPartyUI() {
+    function updatePartyLogUI() {
         inPartyText1.setText(inParty[0]);
         inPartyText2.setText(inParty[1]);
         inPartyText3.setText(inParty[2]);
