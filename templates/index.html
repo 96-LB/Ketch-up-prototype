@@ -42,8 +42,8 @@
     var timerOn = false;
 
     var chatLog; 
-    var inParty; 
-    var inPartyString;
+    var inParty = []; 
+    var inPartyString = "";
 
     function preload ()
     {
@@ -77,8 +77,6 @@
         chatLogText5 = this.add.text(500, 520, chatLog[4]);
         chatLogText6 = this.add.text(500, 550, chatLog[5]);
 
-        inParty = [];
-        inPartyString = "";
         inPartyText = this.add.text(500, 10, "In party: " + inPartyString);
         setUpPartyList();
     }
