@@ -1,7 +1,7 @@
-from core.web import app, discord
 from flask import redirect, url_for, request
 from flask_discord import Unauthorized, AccessDenied
 from oauthlib import oauth2
+from core.web import app, discord
 
 ERRORS = oauth2.rfc6749.errors
 

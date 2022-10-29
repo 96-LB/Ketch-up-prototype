@@ -24,7 +24,8 @@ def connect():
     sessions[request.sid] = {
         'rooms': []
     }
-        
+    Player(discord.fetch_user().id).set_name(discord.fetch_user().name)
+    
     return True
 
 @socket.event
@@ -34,12 +35,12 @@ def join(room):
     
     join_room(room)
     sessions[request.sid]['rooms'].append(room)
-    rooms.setdefault(room, Room(room)).add_player(Player(discord.fetch_user().id))
+    rooms.setdefault(room, Room(room)).add_player(discord.fetch_user().id)
     
     emit('message', f'{discord.fetch_user().name} joined {room}!', to=room)
     emit('joinID', discord.fetch_user().name, to=room)
     
-    return [player.get_id() for player in rooms[room].get_players()]
+    return [player.get_name() for player in rooms[room].get_players()]
 
 @socket.event
 def leave(room):
@@ -48,7 +49,7 @@ def leave(room):
     
     leave_room(room)
     sessions[request.sid]['rooms'].remove(room)
-    rooms.setdefault(room, Room(room)).remove_player(Player(discord.fetch_user().id))
+    rooms.setdefault(room, Room(room)).remove_player(discord.fetch_user().id)
     
     
     emit('message', f'{discord.fetch_user().name} left {room}!', to=room)
