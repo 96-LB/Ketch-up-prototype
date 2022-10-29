@@ -1,8 +1,17 @@
+from flask_discord import requires_authorization
 from core.web import app, discord, socket
-from flask import request
+from flask import abort, render_template, request
 from flask_socketio import ConnectionRefusedError, emit, join_room, leave_room
 
 sessions = {}
+rooms = {}
+
+@app.route('/<string:room>')
+@requires_authorization
+def room_route(room):
+    if not room.isalnum():
+        abort(404) #invalid room name
+    return render_template('index.html', room=room)
 
 
 @socket.event

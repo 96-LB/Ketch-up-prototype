@@ -16,7 +16,8 @@
 <script type="text/javascript">
     
     socket = io();
-    socket.on('message', updateChatLog)
+    socket.on('message', updateChatLog);
+    socket.emit('join', '{{room}}');
     
     var config = {
         type: Phaser.AUTO,
