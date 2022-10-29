@@ -15,25 +15,8 @@
 
 <script type="text/javascript">
     
-    socket = io();
-    socket.on('message', updateChatLog);
-    socket.on('joinID', updatePartyJoin);
-    socket.on('leaveID', updatePartyLeave);
-    socket.emit('join', '{{room}}', setUpPartyList);
+   
     
-    var config = {
-        type: Phaser.AUTO,
-        width: 800,
-        height: 600,
-        scene: {
-            preload: preload,
-            create: create,
-            update: update,
-            render: render
-        }
-    };
-
-    var game = new Phaser.Game(config);
 
     var startButton;
     var startButtonText;
@@ -41,8 +24,8 @@
     var timerCount = 0;
     var timerOn = false;
 
-    var chatLog = ['', '', '', '', '', '']; 
-    var inParty = []; 
+    var chatLog = ['', '', '', '', '', ''];
+    var inParty = [];
     var inPartyString = "";
 
     function preload ()
@@ -50,15 +33,15 @@
         this.load.image('carrot', 'static/assets/carrot.png');
         this.load.image('background', 'static/assets/background.png');
         this.load.image('button', 'static/assets/buttonBackground.png');
-    } 
+    }
 
     function create ()
-    {    
+    {
         this.add.image(400, 400, 'background');
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
-        // Start button        
+        // Start button
         startButton = this.add.image(screenCenterX / 2, (screenCenterY * 2) / 3, 'button')
         .setOrigin(0.5)
         .setInteractive()
@@ -77,10 +60,9 @@
         chatLogText6 = this.add.text(500, 550, chatLog[5]);
 
         inPartyText = this.add.text(500, 10, "In party: " + inPartyString);
-        setUpPartyList();
     }
     
-    function toggleTimer(game) 
+    function toggleTimer(game)
     {
         timerOn = !timerOn;
         if (timerOn) {
@@ -88,16 +70,16 @@
             startButtonText.setText('pause');
         } else {
             updateChatLog("Pausing timer")
-            startButtonText.setText('continue'); 
+            startButtonText.setText('continue');
         }
     }
 
-    function updateTimer() 
+    function updateTimer()
     {
         timerText.setText(`Time: ${Math.floor(timerCount / 60)} minutes, ${timerCount % 60} seconds`);
     }
 
-    function updateChatLog(newLog) 
+    function updateChatLog(newLog)
     {
         chatLog.shift();
         chatLog.push(newLog);
@@ -131,8 +113,9 @@
     }
 
     function setUpPartyList(namesList) {
+        alert(namesList);
         inParty = namesList;
-        // inPartyText.setText("In party: \n" + inParty.join('\n'));
+        inPartyText.setText("In party: \n" + inParty.join('\n'));
     }
 
     var prevTime = 0;
@@ -154,6 +137,25 @@
 
     }
 
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        scene: {
+            preload: preload,
+            create: create,
+            update: update,
+            render: render
+        }
+    };
+
+    var game = new Phaser.Game(config);
+    
+    socket = io();
+    socket.on('message', updateChatLog);
+    socket.on('joinID', updatePartyJoin);
+    socket.on('leaveID', updatePartyLeave);
+    socket.emit('join', '{{room}}', setUpPartyList);
 
 </script>
 
