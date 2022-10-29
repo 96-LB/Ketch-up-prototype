@@ -51,7 +51,11 @@ class Player(JSONData):
     
     def __init__(self, player):
         super().__init__(f'data/players/{player}.json')
+        self._id = str(player)
         self._data.setdefault('test', 0)
+    
+    def get_id(self):
+        return self._id
     
     def get_test(self):
         return self._data['test']
@@ -59,6 +63,8 @@ class Player(JSONData):
     @update
     def set_test(self, value):
         self._data['test'] = value
+    
+    
     
     def to_json(self):
         return json.dumps({'test': self.get_test()})
@@ -70,6 +76,7 @@ class Room(JSONData):
     def __init__(self, room):
         super().__init__( f'data/rooms/{room}.json')
         self._data.setdefault('test2', 0)
+        self._data.setdefault('players', [])
     
     def get_test(self):
         return self._data['test2']
@@ -77,6 +84,15 @@ class Room(JSONData):
     @update
     def set_test(self, value):
         self._data['test2'] = value
+    
+    def add_player(self, player):
+        self._data['players'].append(player)
+    
+    def remove_player(self, player):
+        self._data['players'].remove(player)
+    
+    def get_players(self):
+        return list(self._data['players'])
     
     def to_json(self):
         return json.dumps({'test2': self.get_test()})
