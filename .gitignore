@@ -7,3 +7,4 @@ venv
 replit.nix
 .replit
 .env
+.vscode
