@@ -2,6 +2,10 @@ import json, os
 from abc import ABC, abstractmethod
 from functools import wraps
 
+for path in ['data', 'data/players', 'data/rooms']:
+    if not os.path.exists(path):
+        os.mkdir(path)
+
 def update(func):
     @wraps(func)
     def wrapper(self, *args, **kwargs):
