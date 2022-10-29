@@ -28,12 +28,6 @@
     var inParty = [];
     var inPartyString = "";
 
-    socket = io();
-    socket.on('message', updateChatLog);
-    socket.on('joinID', updatePartyJoin);
-    socket.on('leaveID', updatePartyLeave);
-    socket.emit('join', '{{room}}', setUpPartyList);
-
     function preload ()
     {
         this.load.image('carrot', 'static/assets/carrot.png');
@@ -119,7 +113,6 @@
     }
 
     function setUpPartyList(namesList) {
-        alert(namesList);
         inParty = namesList;
         inPartyText.setText("In party: \n" + inParty.join('\n'));
     }
@@ -162,8 +155,6 @@
     socket.on('joinID', updatePartyJoin);
     socket.on('leaveID', updatePartyLeave);
     socket.emit('join', '{{room}}', setUpPartyList);
-
-    var game = new Phaser.Game(config);
 
 
 </script>
