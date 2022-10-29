@@ -2,6 +2,7 @@ import os
 from base64 import b64encode
 from flask import Flask
 from flask_discord import DiscordOAuth2Session
+from flask_socketio import SocketIO
 from importlib import import_module
 from threading import Thread
 
@@ -29,6 +30,9 @@ for key in ['CLIENT_ID', 'CLIENT_SECRET']:
 #start a discord oauth application
 discord = DiscordOAuth2Session(app)
 app.jinja_env.globals['discord'] = discord
+
+#start a socketio application
+socket = SocketIO(app)
 
 def jinja_env(f):
     #adds a function to the jinja environment
