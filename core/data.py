@@ -104,7 +104,9 @@ class Room(JSONData):
     
     def remove_player(self, player):
         self._data['players'].remove(Player(player))
-        
+    
+    def get_leader(self):
+        return (self._data['players'] or [None])[0]
     
     def get_players(self):
         return list(self._data['players'])

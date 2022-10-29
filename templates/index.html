@@ -27,7 +27,8 @@
     var chatLog = ['', '', '', '', '', ''];
     var inParty = [];
     var inPartyString = "";
-
+    var socket;
+    
     function preload ()
     {
         this.load.image('carrot', 'static/assets/carrot.png');
@@ -72,10 +73,11 @@
     {
         timerOn = !timerOn;
         if (timerOn) {
-            updateChatLog("Starting timer")
+            updateChatLog("Starting timer");
+            socket.emit('start_timer', '{{room}}');
             startButtonText.setText('pause');
         } else {
-            updateChatLog("Pausing timer")
+            updateChatLog("Pausing timer");
             startButtonText.setText('continue');
         }
     }

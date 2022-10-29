@@ -1,11 +1,11 @@
 from flask_discord import requires_authorization
 from flask import abort, render_template, request
 from flask_socketio import ConnectionRefusedError, emit, join_room, leave_room
+from functools import wraps
 from core.web import app, discord, socket
 from core.data import Player, Room
 
-sessions = {}
-rooms = {}
+SESSIONS = {}
 
 @app.route('/<string:room>')
 @requires_authorization
@@ -14,14 +14,20 @@ def room_route(room):
         abort(404) #invalid room name
     return render_template('index.html', room=room)
 
+# silent failure to avoid exceptions
+def requires_login(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if not discord.authorized:
+            print('♠') # just so it's not TOO silent
+            return None
+        return func(*args, **kwargs)
+    return wrapper
 
 @socket.event
+@requires_login
 def connect():
-    if not discord.authorized:
-        print('rejected!')
-        raise ConnectionRefusedError('You must log in to proceed.')
-    
-    sessions[request.sid] = {
+    SESSIONS[request.sid] = {
         'rooms': []
     }
     user = discord.fetch_user()
@@ -30,34 +36,36 @@ def connect():
     return True
 
 @socket.event
+@requires_login
 def join(room):
-    if room in sessions[request.sid]['rooms']:
+    if room in SESSIONS[request.sid]['rooms']:
         return
     
     join_room(room)
-    sessions[request.sid]['rooms'].append(room)
-    rooms.setdefault(room, Room(room)).add_player(discord.fetch_user().id)
+    SESSIONS[request.sid]['rooms'].append(room)
+    Room(room).add_player(discord.fetch_user().id)
     
     emit('message', f'{discord.fetch_user().name} joined the party!', to=room)
     emit('user_join', Player(discord.fetch_user().id), to=room)
     
-    return rooms[room].get_players()
+    return Room(room).get_players()
 
 @socket.event
+@requires_login
 def leave(room):
-    if room not in sessions[request.sid]['rooms']:
+    if room not in SESSIONS[request.sid]['rooms']:
         return False
     
     leave_room(room)
-    sessions[request.sid]['rooms'].remove(room)
-    rooms.setdefault(room, Room(room)).remove_player(discord.fetch_user().id)
+    SESSIONS[request.sid]['rooms'].remove(room)
+    Room(room).remove_player(discord.fetch_user().id)
     
     
-    emit('message', f'{discord.fetch_user().name} left {room}!', to=room)
+    emit('message', f'{discord.fetch_user().name} left the party!', to=room)
     emit('user_leave', Player(discord.fetch_user().id), to=room)
 
 @socket.event
 def disconnect():
-    for room in sessions[request.sid]['rooms']:
+    for room in SESSIONS[request.sid]['rooms']:
         leave(room)
-    del sessions[request.sid]
+    del SESSIONS[request.sid]
