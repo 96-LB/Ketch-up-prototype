@@ -1,9 +1,9 @@
-<!doctype html> 
-<html lang="en"> 
-<head>   
+<!doctype html>
+<html lang="en">
+<head>
     <meta charset="UTF-8" />
-    <title>Ketch-up</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <title>Test</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     <style type="text/css">
         body {
@@ -12,15 +12,12 @@
     </style>
 </head>
 <body>
-    <div>
-            {% if discord.authorized %}
-            <script type="text/javascript"> 
-                console.log("Logged in to discord")
-            </script>
-            {% endif %}
-    </div>
-<script type="text/javascript">
 
+<script type="text/javascript">
+    
+    socket = io();
+    socket.on('message', (data) => alert(data))
+    
     var config = {
         type: Phaser.AUTO,
         width: 800,
@@ -100,8 +97,8 @@
             updateTimer();
         }
     }
-    
-    function render() 
+
+    function update ()
     {
 
     }
