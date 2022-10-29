@@ -10,14 +10,11 @@ def connect():
     if not discord.authorized:
         print('rejected!')
         raise ConnectionRefusedError('You must log in to proceed.')
-    print(f'{discord.fetch_user().name} connected!')
     
     sessions[request.sid] = {
         'rooms': []
     }
-    
-    print(sessions)
-    
+        
     return True
 
 @socket.event
@@ -27,10 +24,7 @@ def join(room):
     
     join_room(room)
     sessions[request.sid]['rooms'].append(room)
-    print(f'{discord.fetch_user().name} joined {room}!')
     emit('message', f'{discord.fetch_user().name} joined {room}!', to=room)
-    
-    print(sessions)
 
 @socket.event
 def leave(room):
@@ -39,17 +33,10 @@ def leave(room):
     
     leave_room(room)
     sessions[request.sid]['rooms'].remove(room)
-    print(f'{discord.fetch_user().name} left {room}!')
     emit('message', f'{discord.fetch_user().name} left {room}!', to=room)
-    
-    print(sessions)
 
 @socket.event
 def disconnect():
     for room in sessions[request.sid]['rooms']:
         leave(room)
     del sessions[request.sid]
-    
-    print(f'{discord.fetch_user().name} disconnected!')
-    
-    print(sessions)
