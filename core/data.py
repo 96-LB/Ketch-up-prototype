@@ -1,6 +1,7 @@
 import json, os
 from abc import ABC, abstractmethod
 from functools import wraps
+from time import time
 
 for path in ['data', 'data/players', 'data/rooms']:
     if not os.path.exists(path):
@@ -89,15 +90,9 @@ class Room(JSONData):
     
     def __init__(self, room):
         super().__init__( f'data/rooms/{room}.json')
-        self._data.setdefault('test2', 0)
         self._data.setdefault('players', [])
-    
-    def get_test(self):
-        return self._data['test2']
-    
-    @update
-    def set_test(self, value):
-        self._data['test2'] = value
+        self._data.setdefault('timer', 0)
+        self._data.setdefault('rest', False)
     
     def add_player(self, player):
         self._data['players'].append(Player(player))
@@ -105,11 +100,25 @@ class Room(JSONData):
     def remove_player(self, player):
         self._data['players'].remove(Player(player))
     
-    def get_leader(self):
-        return (self._data['players'] or [None])[0]
-    
     def get_players(self):
         return list(self._data['players'])
     
+    def get_leader(self):
+        return (self._data['players'] or [None])[0]
+    
+    @update
+    def start_timer(self, minutes, rest=False):
+        self._data['timer'] = int(time() + minutes * 60)
+        self._data['rest'] = rest
+    
+    def get_remaining_time(self):
+        return max(0, self._data['timer'] - int(time()))
+    
+    def on_break(self):
+        return self._data['rest']
+    
     def to_dict(self):
-        return {'test2': self.get_test()}
+        return {
+            'timer': self._data['timer'],
+            'rest': self._data['rest']
+        }

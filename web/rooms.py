@@ -20,7 +20,7 @@ def requires_login(func):
     def wrapper(*args, **kwargs):
         if not discord.authorized:
             print('♠') # just so it's not TOO silent
-            return None
+            return
         return func(*args, **kwargs)
     return wrapper
 
@@ -57,6 +57,7 @@ def leave(room):
         return False
     
     leave_room(room)
+    
     SESSIONS[request.sid]['rooms'].remove(room)
     Room(room).remove_player(discord.fetch_user().id)
     

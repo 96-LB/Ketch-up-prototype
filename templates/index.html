@@ -21,7 +21,7 @@
     var startButton;
     var startButtonText;
 
-    var timerCount = 0;
+    var timeRemaining = 0;
     var timerOn = false;
 
     var chatLog = ['', '', '', '', '', ''];
@@ -51,7 +51,7 @@
 
 
         timerText = this.add.text(100, 10, '', { fill: '#003300' })
-        updateTimer();
+        updateTimer(0);
 
         chatLogText1 = this.add.text(500, 400, chatLog[0]);
         chatLogText2 = this.add.text(500, 430, chatLog[1]);
@@ -66,6 +66,7 @@
         socket.on('message', updateChatLog);
         socket.on('user_join', updatePartyJoin);
         socket.on('user_leave', updatePartyLeave);
+        socket.on('timer', updateTimer);
         socket.emit('join', '{{room}}', setUpPartyList);
     }
     
@@ -82,9 +83,9 @@
         }
     }
 
-    function updateTimer()
+    function updateTimer(timeRemaining)
     {
-        timerText.setText(`Time: ${Math.floor(timerCount / 60)} minutes, ${timerCount % 60} seconds`);
+        timerText.setText(`Time remaining: ${Math.floor(timeRemaining / 60)} minutes, ${timeRemaining % 60} seconds`);
     }
 
     function updateChatLog(newLog)
@@ -130,14 +131,14 @@
 
     function update(time, delta)
     {
-        if (timerOn) {
-            if (Math.floor(time/1000) != prevTime) {
-                prevTime = Math.floor(time/1000);
-                timerCount++;
-                console.log(timerCount);
-            }
-            updateTimer();
-        }
+        // if (timerOn) {
+        //     if (Math.floor(time/1000) != prevTime) {
+        //         prevTime = Math.floor(time/1000);
+        //         timeRemaining++;
+        //         console.log(timeRemaining);
+        //     }
+        //     updateTimer();
+        // }
     }
 
     function render ()
