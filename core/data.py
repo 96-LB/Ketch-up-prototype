@@ -78,6 +78,7 @@ class Player(JSONData):
         self._data.setdefault('user', Dummy())
         self._data.setdefault('hp', 100)
         self._data.setdefault('max_hp', 100)
+        self._data.setdefault('exp', 0)
         self._data.setdefault('damage', 25)
     
     def get_id(self):
@@ -100,12 +101,20 @@ class Player(JSONData):
     def get_hp(self):
         return self._data['hp']
     
+    def get_exp(self):
+        return self._data['exp']
+    
+    @update
+    def add_exp(self, amount):
+        self._data['exp'] += amount
+    
     def to_dict(self):
         return {
             'id': self.get_id(),
             'name': self._data['user'].name,
             'hp': self._data['hp'],
             'max_hp': self._data['max_hp'],
+            'exp': self._data['exp'],
             'damage': self._data['damage']
         }
 
@@ -117,11 +126,13 @@ class Room(JSONData):
         super().__init__( f'data/rooms/{room}.json')
         self._data.setdefault('players', [])
         self._data.setdefault('timer', 0)
-        self._data.setdefault('rest', False)
-        self._data.setdefault('hp', 100)
-        self._data.setdefault('damage', 25)
+        self._data.setdefault('rest', True)
+        self._data.setdefault('hp', 0)
+        self._data.setdefault('max_hp', 0)
+        self._data.setdefault('damage', 0)
         self._data.setdefault('attackers', []) # list of players who have attacked this turn
         self._data.setdefault('healers', []) # list of players who have healed this turn
+        self._data.setdefault('running', False) # is the game running or not
     
     def add_player(self, player):
         self._data['players'].append(Player(player))
@@ -158,6 +169,7 @@ class Room(JSONData):
     def start_timer(self, minutes, rest=False):
         self._data['timer'] = int(time() + minutes * .60) # TODO: make this not 100x faster than it should be
         self._data['rest'] = rest
+        self._data['running'] = True
     
     def get_remaining_time(self):
         return max(0, self._data['timer'] - int(time()))
@@ -168,20 +180,41 @@ class Room(JSONData):
     @update
     def damage(self, amount):
         self._data['hp'] -= amount
-        if self._data['hp'] <= 0:
-            self._data['hp'] = 100
+        self._data['hp'] = min(max(self._data['hp'], 0), self._data['max_hp'])
     
     def get_damage(self):
         return self._data['damage']
-
+    
+    def get_hp(self):
+        return self._data['hp']
+    
+    @update
+    def summon_boss(self, hp, damage):
+        self._data['hp'] = hp
+        self._data['max_hp'] = hp
+        self._data['damage'] = damage
     
     
+    @update
+    def reset(self):
+        self._data['hp'] = 0
+        self._data['max_hp'] = 0
+        self._data['damage'] = 0
+        self._data['timer'] = 0
+        self._data['rest'] = True
+        self._data['attackers'] = []
+        self._data['healers'] = []
+        self._data['running'] = False
+    
+    def is_running(self):
+        return self._data['running']
     
     def to_dict(self):
         return {
             'timer': self._data['timer'],
             'rest': self._data['rest'],
             'hp': self._data['hp'],
+            'max_hp': self._data['max_hp'],
             'damage': self._data['damage'],
             'attackers': [player.get_id() for player in self._data['attackers']],
             'healers': [player.get_id() for player in self._data['healers']],

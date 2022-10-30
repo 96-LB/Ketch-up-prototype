@@ -45,6 +45,7 @@ def join(room):
     SESSIONS[request.sid]['rooms'].append(room)
     Room(room).add_player(discord.fetch_user().id)
     
+    
     emit('message', f'{discord.fetch_user().name} joined the party!', to=room)
     emit('user_join', Player(discord.fetch_user().id), to=room)
     
