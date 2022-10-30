@@ -37,7 +37,10 @@ class JSONData(ABC):
     def load(file):
         if os.path.exists(file):
             with open(file, 'r') as f:
-                return json.load(f)
+                try:
+                    return json.load(f)
+                except json.JSONDecodeError:
+                    return {}
         else:
             return {}
     
@@ -117,6 +120,8 @@ class Room(JSONData):
         self._data.setdefault('rest', False)
         self._data.setdefault('hp', 100)
         self._data.setdefault('damage', 25)
+        self._data.setdefault('attackers', []) # list of players who have attacked this turn
+        self._data.setdefault('healers', []) # list of players who have healed this turn
     
     def add_player(self, player):
         self._data['players'].append(Player(player))
@@ -129,6 +134,25 @@ class Room(JSONData):
     
     def get_leader(self):
         return (self._data['players'] or [None])[0]
+    
+    @update
+    def add_attacker(self, player):
+        self._data['attackers'].append(Player(player))
+    
+    @update
+    def add_healer(self, player):
+        self._data['healers'].append(Player(player))
+    
+    def has_attacked(self, player):
+        return player in self._data['attackers']
+    
+    def has_healed(self, player):
+        return player in self._data['healers']
+    
+    @update
+    def clear_turn(self):
+        self._data['attackers'] = []
+        self._data['healers'] = []
     
     @update
     def start_timer(self, minutes, rest=False):
@@ -158,5 +182,7 @@ class Room(JSONData):
             'timer': self._data['timer'],
             'rest': self._data['rest'],
             'hp': self._data['hp'],
-            'damage': self._data['damage']
+            'damage': self._data['damage'],
+            'attackers': [player.get_id() for player in self._data['attackers']],
+            'healers': [player.get_id() for player in self._data['healers']],
         }

@@ -4,11 +4,11 @@ from flask_socketio import ConnectionRefusedError, emit
 from functools import wraps
 from core.web import app, discord, socket
 from core.data import Player, Room
-from .rooms import requires_login
+from .combat import requires_party_member
 
 def requires_leader(func):
     @wraps(func)
-    @requires_login
+    @requires_party_member
     def wrapper(room, *args, **kwargs):
         if Player(discord.fetch_user().id) != Room(room).get_leader():
             print('♥') # just so it's not TOO silent
@@ -34,6 +34,7 @@ def timer_loop(room):
             else:
                 socket.emit('message', 'Break time~!', to=room)
                 socket.emit('timer_break', to=room)
+                Room(room).clear_turn()
                 Room(room).start_timer(5, True)
         socket.sleep(1)
 
