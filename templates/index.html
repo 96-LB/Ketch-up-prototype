@@ -72,15 +72,15 @@
     
     function toggleTimer(game)
     {
-        timerOn = !timerOn;
-        if (timerOn) {
+        //timerOn = !timerOn;
+        //if (timerOn) {
             updateChatLog("Starting timer");
             socket.emit('start_timer', '{{room}}');
-            startButtonText.setText('pause');
-        } else {
-            updateChatLog("Pausing timer");
-            startButtonText.setText('continue');
-        }
+        //    startButtonText.setText('pause');
+        //} else {
+        //    updateChatLog("Pausing timer");
+        //    startButtonText.setText('continue');
+        //}
     }
 
     function updateTimer(timeRemaining)

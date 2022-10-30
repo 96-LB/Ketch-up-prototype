@@ -25,11 +25,18 @@ def start_timer(room, minutes, rest=False):
 
 def timer_loop(room):
     while True:
-        socket.sleep(1)
         socket.emit('timer', Room(room).get_remaining_time(), to=room)
         if Room(room).get_remaining_time() <= 0:
-            socket.emit('message', 'timer finished', to=room)
-            break
+            if Room(room).on_break():
+                socket.emit('message', 'Time\'s up!', to=room)
+                socket.emit('timer_end', to=room)
+                Room(room).start_timer(25)
+            else:
+                socket.emit('message', 'Break time~!', to=room)
+                socket.emit('timer_break', to=room)
+                Room(room).start_timer(5, True)
+        socket.sleep(1)
+
 
 
 @socket.event
@@ -38,6 +45,6 @@ def start_timer(room):
     if Room(room).get_remaining_time() > 0:
         return
     
-    Room(room).start_timer(25 / 100) # TODO: increase time
+    Room(room).start_timer(25)
     socket.start_background_task(timer_loop, room)
     emit('message', 'It\'s time to Ketch up on your work~!', to=room)
