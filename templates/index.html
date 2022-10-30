@@ -16,7 +16,6 @@
 <script type="text/javascript">
 
     var startButton;
-    var startButtonText;
 
     var timeRemaining = 0;
     var timerOn = false;
@@ -25,6 +24,9 @@
     var inParty = [];
     var inPartyString = "";
     var socket;
+    var isRunning = false;
+    
+    var selfName = "{{discord.fetch_user().name}}";
     
     function preload ()
     {
@@ -37,27 +39,27 @@
     function create ()
     {
         this.add.image(400, 400, 'background');
-        this.add.image(200, 500, 'tomato').setOrigin(0.5);
+        this.add.image(200, 200, 'tomato').setOrigin(0.5);
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
         // Start button
-        startButton = this.add.image(screenCenterX / 2, (screenCenterY * 2) / 3, 'button')
-        .setOrigin(0.5)
+        startButton = this.add.image(this.cameras.main.width - 20,  this.cameras.main.height - 20, 'button')
+        .setOrigin(1, 1)
         .setInteractive()
-        .on('pointerdown', () => toggleTimer(this));
-        startButtonText = this.add.text(screenCenterX / 2, (screenCenterY * 2) / 3, 'start').setOrigin(0.5)
+        .on('pointerdown', () => toggleTimer(this))
+        .setVisible(false);
 
 
         timerText = this.add.text(100, 10, '', { fill: '#003300' })
-        updateTimer(0);
-
-        chatLogText1 = this.add.text(500, 400, chatLog[0]);
-        chatLogText2 = this.add.text(500, 430, chatLog[1]);
-        chatLogText3 = this.add.text(500, 460, chatLog[2]);
-        chatLogText4 = this.add.text(500, 490, chatLog[3]);
-        chatLogText5 = this.add.text(500, 520, chatLog[4]);
-        chatLogText6 = this.add.text(500, 550, chatLog[5]);
+    
+        let settings = { fill: '#003300', strokeThickness: 3, fontFamily: 'Arial Black'}; // font settings
+        chatLogText1 = this.add.text(20, 410, chatLog[0], settings);
+        chatLogText2 = this.add.text(20, 440, chatLog[1], settings);
+        chatLogText3 = this.add.text(20, 470, chatLog[2], settings);
+        chatLogText4 = this.add.text(20, 500, chatLog[3], settings);
+        chatLogText5 = this.add.text(20, 530, chatLog[4], settings);
+        chatLogText6 = this.add.text(20, 560, chatLog[5], settings);
 
         inPartyText = this.add.text(500, 10, "In party: " + inPartyString);
         
@@ -71,20 +73,15 @@
     
     function toggleTimer(game)
     {
-        //timerOn = !timerOn;
-        //if (timerOn) {
-            updateChatLog("Starting timer");
-            socket.emit('start_timer', '{{room}}');
-        //    startButtonText.setText('pause');
-        //} else {
-        //    updateChatLog("Pausing timer");
-        //    startButtonText.setText('continue');
-        //}
+        updateChatLog("Starting timer");
+        socket.emit('start_timer', '{{room}}');
     }
 
     function updateTimer(timeRemaining)
     {
+        isRunning = true;
         timerText.setText(`Time remaining: ${Math.floor(timeRemaining / 60)} minutes, ${timeRemaining % 60} seconds`);
+        updateButtonUI();
     }
 
     function updateChatLog(newLog)
@@ -112,8 +109,9 @@
 
     function updatePartyLeave(player) {
         inParty.splice(inParty.indexOf(player.name), 1);
-
+        
         updatePartyLogUI();
+        updateButtonUI()
     }
     
     function updatePartyLogUI() {
@@ -124,20 +122,22 @@
         inParty = players.map((player) => player.name);
         
         updatePartyLogUI();
+        updateButtonUI();
     }
 
+    function updateButtonUI() {
+        if(inParty.length > 0 && inParty[0] == selfName && !isRunning) {
+            startButton.setVisible(true);
+        } else {
+            startButton.setVisible(false);
+        }
+    }
+    
     var prevTime = 0;
 
     function update(time, delta)
     {
-        // if (timerOn) {
-        //     if (Math.floor(time/1000) != prevTime) {
-        //         prevTime = Math.floor(time/1000);
-        //         timeRemaining++;
-        //         console.log(timeRemaining);
-        //     }
-        //     updateTimer();
-        // }
+        
     }
 
     function render ()
