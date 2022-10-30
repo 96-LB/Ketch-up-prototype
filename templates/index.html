@@ -48,11 +48,13 @@
         this.load.image('carrot', 'static/assets/carrot.png');
         this.load.image('background', 'static/assets/background.png');
         this.load.image('button', 'static/assets/buttonBackground.png');
+        this.load.image('tomato', 'static/assets/tomato.png');
     } 
 
     function create ()
     {    
         this.add.image(400, 400, 'background');
+        this.add.image(200, 500, 'tomato').setOrigin(0.5);
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
@@ -75,7 +77,6 @@
         chatLogText6 = this.add.text(500, 550, chatLog[5]);
 
         inPartyText = this.add.text(500, 10, "In party: " + inPartyString);
-        setUpPartyList();
     }
     
     function toggleTimer(game) 
@@ -129,8 +130,9 @@
     }
 
     function setUpPartyList(namesList) {
+        console.log(namesList);
         inParty = namesList;
-        // inPartyText.setText("In party: \n" + inParty.join('\n'));
+        inPartyText.setText("In party: \n" + inParty.join('\n'));
     }
 
     var prevTime = 0;
