@@ -4,7 +4,7 @@ from flask_socketio import ConnectionRefusedError, emit
 from functools import wraps
 from core.web import app, discord, socket
 from core.data import Player, Room
-from .rooms import SESSIONS, requires_login
+from .rooms import requires_login
 
 def requires_leader(func):
     @wraps(func)
@@ -28,7 +28,7 @@ def timer_loop(room):
         socket.emit('timer', Room(room).get_remaining_time(), to=room)
         if Room(room).get_remaining_time() <= 0:
             if Room(room).on_break():
-                socket.emit('message', 'Time\'s up!', to=room)
+                socket.emit('message', 'Back to work!', to=room)
                 socket.emit('timer_end', to=room)
                 Room(room).start_timer(25)
             else:

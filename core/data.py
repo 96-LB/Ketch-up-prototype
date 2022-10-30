@@ -15,6 +15,11 @@ class CustomJSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 json.JSONEncoder.default = CustomJSONEncoder.default
 
+class Dummy():
+    def __getattr__(self, attr):
+        return ''
+
+
 
 def update(func):
     @wraps(func)
@@ -67,7 +72,10 @@ class Player(JSONData):
     def __init__(self, player):
         super().__init__(f'data/players/{player}.json')
         self._id = str(player)
-        self._data.setdefault('name', 'Unknown User')
+        self._data.setdefault('user', Dummy())
+        self._data.setdefault('hp', 100)
+        self._data.setdefault('max_hp', 100)
+        self._data.setdefault('damage', 25)
     
     def get_id(self):
         return self._id
@@ -77,11 +85,25 @@ class Player(JSONData):
     
     def set_user(self, user):
         self._data['user'] = user
-        
+    
+    @update
+    def damage(self, amount):
+        self._data['hp'] -= amount
+        self._data['hp'] = min(max(self._data['hp'], 0), self._data['max_hp'])
+    
+    def get_damage(self):
+        return self._data['damage']
+    
+    def get_hp(self):
+        return self._data['hp']
+    
     def to_dict(self):
         return {
             'id': self.get_id(),
-            'name': self._data['user'].name
+            'name': self._data['user'].name,
+            'hp': self._data['hp'],
+            'max_hp': self._data['max_hp'],
+            'damage': self._data['damage']
         }
 
 
@@ -93,6 +115,8 @@ class Room(JSONData):
         self._data.setdefault('players', [])
         self._data.setdefault('timer', 0)
         self._data.setdefault('rest', False)
+        self._data.setdefault('hp', 100)
+        self._data.setdefault('damage', 25)
     
     def add_player(self, player):
         self._data['players'].append(Player(player))
@@ -116,9 +140,23 @@ class Room(JSONData):
     
     def on_break(self):
         return self._data['rest']
+        
+    @update
+    def damage(self, amount):
+        self._data['hp'] -= amount
+        if self._data['hp'] <= 0:
+            self._data['hp'] = 100
+    
+    def get_damage(self):
+        return self._data['damage']
+
+    
+    
     
     def to_dict(self):
         return {
             'timer': self._data['timer'],
-            'rest': self._data['rest']
+            'rest': self._data['rest'],
+            'hp': self._data['hp'],
+            'damage': self._data['damage']
         }
