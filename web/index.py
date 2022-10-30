@@ -5,4 +5,4 @@ from flask_discord import requires_authorization
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return 'hi'

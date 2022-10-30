@@ -14,51 +14,34 @@
 <body>
 
 <script type="text/javascript">
-    
-    var config = {
-        type: Phaser.AUTO,
-        width: 800,
-        height: 600,
-        scene: {
-            preload: preload,
-            create: create,
-            update: update,
-            render: render
-        }
-    };
 
     var startButton;
     var startButtonText;
 
-    var timerCount = 0;
+    var timeRemaining = 0;
     var timerOn = false;
 
-    var chatLog = ['', '', '', '', '', '']; 
-    var inParty = []; 
+    var chatLog = ['', '', '', '', '', ''];
+    var inParty = [];
     var inPartyString = "";
-
-    socket = io();
-    socket.on('message', updateChatLog);
-    socket.on('joinID', updatePartyJoin);
-    socket.on('leaveID', updatePartyLeave);
-    socket.emit('join', '{{room}}', setUpPartyList);
-
+    var socket;
+    
     function preload ()
     {
         this.load.image('carrot', 'static/assets/carrot.png');
         this.load.image('background', 'static/assets/background.png');
         this.load.image('button', 'static/assets/buttonBackground.png');
         this.load.image('tomato', 'static/assets/tomato.png');
-    } 
+    }
 
     function create ()
-    {    
+    {
         this.add.image(400, 400, 'background');
         this.add.image(200, 500, 'tomato').setOrigin(0.5);
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
-        // Start button        
+        // Start button
         startButton = this.add.image(screenCenterX / 2, (screenCenterY * 2) / 3, 'button')
         .setOrigin(0.5)
         .setInteractive()
@@ -67,7 +50,7 @@
 
 
         timerText = this.add.text(100, 10, '', { fill: '#003300' })
-        updateTimer();
+        updateTimer(0);
 
         chatLogText1 = this.add.text(500, 400, chatLog[0]);
         chatLogText2 = this.add.text(500, 430, chatLog[1]);
@@ -77,26 +60,34 @@
         chatLogText6 = this.add.text(500, 550, chatLog[5]);
 
         inPartyText = this.add.text(500, 10, "In party: " + inPartyString);
+        
+        socket = io();
+        socket.on('message', updateChatLog);
+        socket.on('user_join', updatePartyJoin);
+        socket.on('user_leave', updatePartyLeave);
+        socket.on('timer', updateTimer);
+        socket.emit('join', '{{room}}', setUpPartyList);
     }
     
-    function toggleTimer(game) 
+    function toggleTimer(game)
     {
-        timerOn = !timerOn;
-        if (timerOn) {
-            updateChatLog("Starting timer")
-            startButtonText.setText('pause');
-        } else {
-            updateChatLog("Pausing timer")
-            startButtonText.setText('continue'); 
-        }
+        //timerOn = !timerOn;
+        //if (timerOn) {
+            updateChatLog("Starting timer");
+            socket.emit('start_timer', '{{room}}');
+        //    startButtonText.setText('pause');
+        //} else {
+        //    updateChatLog("Pausing timer");
+        //    startButtonText.setText('continue');
+        //}
     }
 
-    function updateTimer() 
+    function updateTimer(timeRemaining)
     {
-        timerText.setText(`Time: ${Math.floor(timerCount / 60)} minutes, ${timerCount % 60} seconds`);
+        timerText.setText(`Time remaining: ${Math.floor(timeRemaining / 60)} minutes, ${timeRemaining % 60} seconds`);
     }
 
-    function updateChatLog(newLog) 
+    function updateChatLog(newLog)
     {
         chatLog.shift();
         chatLog.push(newLog);
@@ -113,14 +104,14 @@
         chatLogText6.setText(chatLog[5]);
     }
 
-    function updatePartyJoin(name) {
-        inParty.push(name);
+    function updatePartyJoin(player) {
+        inParty.push(player.name);
 
         updatePartyLogUI();
     }
 
-    function updatePartyLeave(name) {
-        inParty.splice(inParty.indexOf(name), 1);
+    function updatePartyLeave(player) {
+        inParty.splice(inParty.indexOf(player.name), 1);
 
         updatePartyLogUI();
     }
@@ -129,24 +120,24 @@
         inPartyText.setText("In party: \n" + inParty.join('\n'));
     }
 
-    function setUpPartyList(namesList) {
-        console.log(namesList);
-        inParty = namesList;
-        inPartyText.setText("In party: \n" + inParty.join('\n'));
+    function setUpPartyList(players) {
+        inParty = players.map((player) => player.name);
+        
+        updatePartyLogUI();
     }
 
     var prevTime = 0;
 
     function update(time, delta)
     {
-        if (timerOn) {
-            if (Math.floor(time/1000) != prevTime) {
-                prevTime = Math.floor(time/1000);
-                timerCount++;
-                console.log(timerCount);
-            }
-            updateTimer();
-        }
+        // if (timerOn) {
+        //     if (Math.floor(time/1000) != prevTime) {
+        //         prevTime = Math.floor(time/1000);
+        //         timeRemaining++;
+        //         console.log(timeRemaining);
+        //     }
+        //     updateTimer();
+        // }
     }
 
     function render ()
@@ -154,6 +145,17 @@
 
     }
 
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        scene: {
+            preload: preload,
+            create: create,
+            update: update,
+            render: render
+        }
+    };
 
     var game = new Phaser.Game(config);
 
