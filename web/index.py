@@ -1,15 +1,14 @@
-from core.data import Player, Room
+from core.data import Player
 from core.web import app, discord
-from flask import render_template
-from flask_discord import requires_authorization
 
 @app.route('/')
 def index():
     output = 'hi'
     if discord.authorized:
+        player = Player(discord.fetch_user().id)
         output += f', {discord.fetch_user().name}'
         output += '<br>'
-        output += 'you have ' + str(Player(discord.fetch_user().id).get_exp()) + ' exp'
+        output += f'you have {player.get_exp()} exp and {player.get_hp()}/{100} hp'
         output += '<br>'
         output += '<a href="/logout">logout</a>'
     else:

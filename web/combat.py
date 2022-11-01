@@ -36,7 +36,7 @@ def damage_player(room, player):
     damage = Room(room).get_damage()
     if player.get_hp() > 0:
             player.damage(damage)
-            emit('message', f'{player.get_user().name} takes {damage} damage!', to=room)
+            emit('message', f'Procrabination attacks {player.get_user().name} for {damage} damage!', to=room)
             if player.get_hp() <= 0:
                 emit('message', f'{player.get_user().name} has been knocked down!', to=room)
 
@@ -56,10 +56,10 @@ def attack(room):
     Room(room).add_attacker(discord.fetch_user().id)
     damage = Player(discord.fetch_user().id).get_damage()
     Room(room).damage(damage)
-    emit('message', f'{discord.fetch_user().name} attacks for {damage} damage!', to=room)
+    emit('message', f'{discord.fetch_user().name} attacks Procrabination for {damage} damage!', to=room)
     
     if Room(room).get_hp() <= 0:
-        emit('message', f'The monster has been defeated!', to=room)
+        emit('message', f'Procrabination has been defeated!', to=room)
         emit('victory', to=room)
         for player in Room(room).get_players():
             player.add_exp(1)

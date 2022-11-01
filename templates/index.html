@@ -17,7 +17,8 @@
 
     const ROOM = '{{room}}';
     var startButton;
-
+    var boss;
+    
     var timeRemaining = 0;
     var timerOn = false;
 
@@ -38,12 +39,14 @@
         this.load.image('heal_button', 'static/assets/healButton.png');
         this.load.image('death_button', 'static/assets/deathButton.png');
         this.load.image('tomato', 'static/assets/tomato.png');
+        this.load.image('boss', 'static/assets/procrabination.png');
     }
 
     function create ()
     {
         this.add.image(400, 400, 'background');
         this.add.image(200, 200, 'tomato').setOrigin(0.5);
+        boss = this.add.image(500, 200, 'boss').setOrigin(0.5).setVisible(false);
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
@@ -103,6 +106,7 @@
     function updateTimer(timeRemaining)
     {
         timerText.setText(`Time remaining: ${Math.floor(timeRemaining / 60)} minutes, ${timeRemaining % 60} seconds`);
+        boss.setVisible(true);
         updateButtonUI();
     }
 
@@ -182,10 +186,12 @@
         isRunning = true;
         startButton.setTexture('death_button');
         startButton.setVisible(true);
+        boss.setVisible(true);
     }
     
     function victory() {
         isRunning = false;
+        boss.setVisible(false);
         updateButtonUI();
     }
     
