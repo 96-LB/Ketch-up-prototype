@@ -36,6 +36,7 @@
         this.load.image('begin_button', 'static/assets/buttonBackground.png');
         this.load.image('attack_button', 'static/assets/attackButton.png');
         this.load.image('heal_button', 'static/assets/healButton.png');
+        this.load.image('death_button', 'static/assets/deathButton.png');
         this.load.image('tomato', 'static/assets/tomato.png');
     }
 
@@ -92,6 +93,10 @@
         else if(startButton.texture.key == 'heal_button')
         {
             heal();
+        }
+        else if(startButton.texture.key == 'death_button')
+        {
+            takeDamage();
         }
     }
     
@@ -154,6 +159,10 @@
         }
     }
     
+    function takeDamage() {
+        socket.emit('damage', ROOM);
+    }
+    
     function startBreak() {
         startButton.setTexture('attack_button');
         startButton.setVisible(true);
@@ -171,7 +180,8 @@
     
     function startWork() {
         isRunning = true;
-        startButton.setVisible(false);
+        startButton.setTexture('death_button');
+        startButton.setVisible(true);
     }
     
     function victory() {

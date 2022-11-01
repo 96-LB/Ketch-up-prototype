@@ -22,7 +22,10 @@ def requires_party_member(func):
 @socket.event
 @requires_party_member
 def damage(room):
-    if Room(room).on_break():
+    if (
+        Room(room).on_break()
+        or Player(discord.fetch_user().id).get_hp() <= 0
+    ):
         return
     
     damage_player(room, Player(discord.fetch_user().id))
@@ -35,7 +38,7 @@ def damage_player(room, player):
             player.damage(damage)
             emit('message', f'{player.get_user().name} takes {damage} damage!', to=room)
             if player.get_hp() <= 0:
-                emit('message', f'{player.get_user().name} has been defeated!', to=room)
+                emit('message', f'{player.get_user().name} has been knocked down!', to=room)
 
 
 
@@ -75,4 +78,7 @@ def heal(room):
     
     Room(room).add_healer(discord.fetch_user().id)
     Player(discord.fetch_user().id).damage(-10)
-    emit('message', f'{discord.fetch_user().name} heals 10 HP!', to=room)
+    if Player(discord.fetch_user().id).get_hp() == 10:
+        emit('message', f'{discord.fetch_user().name} has gotten back up!', to=room)
+    else:
+        emit('message', f'{discord.fetch_user().name} heals 10 HP!', to=room)

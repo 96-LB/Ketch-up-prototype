@@ -55,7 +55,7 @@ def start_timer(room):
     Room(room).start_timer(25)
     
     if Room(room).get_hp() <= 0:
-        Room(room).summon_boss(hp=100, damage=random.randint(20, 30))
+        Room(room).summon_boss(hp=100, damage=random.randint(5, 10))
     
     
     socket.start_background_task(timer_loop, room)
