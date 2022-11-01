@@ -167,7 +167,7 @@ class Room(JSONData):
     
     @update
     def start_timer(self, minutes, rest=False):
-        self._data['timer'] = int(time() + minutes * .60) # TODO: make this not 100x faster than it should be
+        self._data['timer'] = int(time() + minutes) # TODO: make this not 60x faster than it should be
         self._data['rest'] = rest
         self._data['running'] = True
     
