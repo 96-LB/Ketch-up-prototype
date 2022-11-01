@@ -35,7 +35,7 @@ def timer_loop(room):
                 return
             if Room(room).on_break():
                 socket.emit('message', 'Back to work!', to=room)
-                socket.emit('timer_end', to=room)
+                socket.emit('timer_work', to=room)
                 Room(room).start_timer(25)
             else:
                 socket.emit('message', 'Break time~!', to=room)
@@ -59,4 +59,5 @@ def start_timer(room):
     
     
     socket.start_background_task(timer_loop, room)
+    socket.emit('timer_start', to=room)
     emit('message', 'It\'s time to Ketch up on your work~!', to=room)

@@ -15,6 +15,7 @@
 
 <script type="text/javascript">
 
+    const ROOM = '{{room}}';
     var startButton;
 
     var timeRemaining = 0;
@@ -32,7 +33,9 @@
     {
         this.load.image('carrot', 'static/assets/carrot.png');
         this.load.image('background', 'static/assets/background.png');
-        this.load.image('button', 'static/assets/buttonBackground.png');
+        this.load.image('begin_button', 'static/assets/buttonBackground.png');
+        this.load.image('attack_button', 'static/assets/attackButton.png');
+        this.load.image('heal_button', 'static/assets/healButton.png');
         this.load.image('tomato', 'static/assets/tomato.png');
     }
 
@@ -44,7 +47,7 @@
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
         // Start button
-        startButton = this.add.image(this.cameras.main.width - 20,  this.cameras.main.height - 20, 'button')
+        startButton = this.add.image(this.cameras.main.width - 20,  this.cameras.main.height - 20, 'begin_button')
         .setOrigin(1, 1)
         .setInteractive()
         .on('pointerdown', () => toggleTimer(this))
@@ -68,18 +71,32 @@
         socket.on('user_join', updatePartyJoin);
         socket.on('user_leave', updatePartyLeave);
         socket.on('timer', updateTimer);
-        socket.emit('join', '{{room}}', setUpPartyList);
+        socket.on('timer_start', startWork);
+        socket.on('timer_break', startBreak);
+        socket.on('timer_work', startWork);
+        socket.on('victory', victory);
+        socket.emit('join', ROOM, setUpPartyList);
     }
     
     function toggleTimer(game)
     {
-        updateChatLog("Starting timer");
-        socket.emit('start_timer', '{{room}}');
+        if(!isRunning)
+        {
+            socket.emit('start_timer', ROOM);
+            startWork();
+        }
+        else if(startButton.texture.key == 'attack_button')
+        {
+            attack();
+        }
+        else if(startButton.texture.key == 'heal_button')
+        {
+            heal();
+        }
     }
-
+    
     function updateTimer(timeRemaining)
     {
-        isRunning = true;
         timerText.setText(`Time remaining: ${Math.floor(timeRemaining / 60)} minutes, ${timeRemaining % 60} seconds`);
         updateButtonUI();
     }
@@ -126,15 +143,44 @@
     }
 
     function updateButtonUI() {
-        if(inParty.length > 0 && inParty[0] == selfName && !isRunning) {
-            startButton.setVisible(true);
-        } else {
-            startButton.setVisible(false);
+        if(!isRunning)
+        {
+            if(inParty.length > 0 && inParty[0] == selfName) {
+                startButton.setTexture('begin_button');
+                startButton.setVisible(true);
+            } else {
+                startButton.setVisible(false);
+            }
         }
     }
     
+    function startBreak() {
+        startButton.setTexture('attack_button');
+        startButton.setVisible(true);
+    }
+    
+    function attack() {
+        socket.emit('attack', ROOM);
+        startButton.setTexture('heal_button');
+    }
+    
+    function heal() {
+        socket.emit('heal', ROOM);
+        startButton.setVisible(false);
+    }
+    
+    function startWork() {
+        isRunning = true;
+        startButton.setVisible(false);
+    }
+    
+    function victory() {
+        isRunning = false;
+        updateButtonUI();
+    }
+    
     var prevTime = 0;
-
+    
     function update(time, delta)
     {
         

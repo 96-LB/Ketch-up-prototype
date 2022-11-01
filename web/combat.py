@@ -42,7 +42,12 @@ def damage_player(room, player):
 @socket.event
 @requires_party_member
 def attack(room):
-    if not Room(room).on_break() or Room(room).has_attacked(Player(discord.fetch_user().id)) or not Room(room).is_running():
+    if (
+        not Room(room).on_break() or
+        Room(room).has_attacked(Player(discord.fetch_user().id)) or
+        not Room(room).is_running() or
+        Player(discord.fetch_user().id).get_hp() <= 0
+    ):
         return
     
     Room(room).add_attacker(discord.fetch_user().id)
@@ -52,6 +57,7 @@ def attack(room):
     
     if Room(room).get_hp() <= 0:
         emit('message', f'The monster has been defeated!', to=room)
+        emit('victory', to=room)
         for player in Room(room).get_players():
             player.add_exp(1)
         Room(room).reset()
@@ -60,7 +66,11 @@ def attack(room):
 @socket.event
 @requires_party_member
 def heal(room):
-    if not Room(room).on_break() or Room(room).has_healed(Player(discord.fetch_user().id)) or not Room(room).is_running():
+    if (
+        not Room(room).on_break() or
+        Room(room).has_healed(Player(discord.fetch_user().id)) or
+        not Room(room).is_running()
+    ):
         return
     
     Room(room).add_healer(discord.fetch_user().id)
